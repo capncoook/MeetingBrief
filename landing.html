@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MeetingBrief - AI Meeting Notes & Action Items</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0f172a;
+            --accent: #3b82f6;
+            --accent-light: #60a5fa;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --bg: #f8fafc;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-accent {
+            color: var(--accent);
+        }
+
+        /* Hero Section */
+        .hero {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 6rem 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(59, 130, 246, 0.02) 100%);
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -1px;
+            color: var(--primary);
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, var(--accent), var(--accent-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: var(--text-light);
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Problem Section */
+        .problems {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .problem-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            text-align: left;
+        }
+
+        .problem-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .problem-card h3 {
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .problem-card p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        /* CTA Button */
+        .cta-section {
+            margin-top: 3rem;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(59, 130, 246, 0.3);
+        }
+
+        .cta-button:active {
+            transform: translateY(0);
+        }
+
+        /* Features Section */
+        .features {
+            max-width: 1200px;
+            margin: 5rem auto;
+            padding: 0 2rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: var(--primary);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .feature h3 {
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .feature p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        /* Stats */
+        .stats {
+            background: white;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 3rem 2rem;
+            margin: 4rem 0;
+        }
+
+        .stats-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            text-align: center;
+        }
+
+        .stat {
+            padding: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        /* Pricing */
+        .pricing {
+            max-width: 1200px;
+            margin: 5rem auto;
+            padding: 0 2rem;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .pricing-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .pricing-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .pricing-card.popular {
+            border-color: var(--accent);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.02) 0%, rgba(59, 130, 246, 0.05) 100%);
+        }
+
+        .popular-badge {
+            background: var(--accent);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .pricing-card h3 {
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .price-period {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .features-list {
+            text-align: left;
+            margin: 1.5rem 0;
+            padding: 1.5rem 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .features-list li {
+            list-style: none;
+            padding: 0.5rem 0;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+        }
+
+        .features-list li:before {
+            content: "✓";
+            color: var(--accent);
+            font-weight: 700;
+            margin-right: 0.75rem;
+        }
+
+        /* Email Capture */
+        .email-section {
+            background: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border);
+        }
+
+        .email-content {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .email-section h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .email-section p {
+            color: var(--text-light);
+            margin-bottom: 2rem;
+            font-size: 1.05rem;
+        }
+
+        .email-form {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .email-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        .email-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .email-button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .email-button:hover {
+            background: var(--accent-light);
+        }
+
+        .email-message {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 5rem;
+        }
+
+        footer p {
+            opacity: 0.7;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero {
+                padding: 4rem 1.5rem;
+            }
+
+            .email-form {
+                flex-direction: column;
+            }
+
+            .email-input, .email-button {
+                width: 100%;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .feature, .pricing-card {
+            animation: fadeInUp 0.8s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .feature:nth-child(1) { animation-delay: 0.1s; }
+        .feature:nth-child(2) { animation-delay: 0.2s; }
+        .feature:nth-child(3) { animation-delay: 0.3s; }
+
+        .pricing-card:nth-child(1) { animation-delay: 0.1s; }
+        .pricing-card:nth-child(2) { animation-delay: 0.2s; }
+        .pricing-card:nth-child(3) { animation-delay: 0.3s; }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <div class="logo">Meeting<span class="logo-accent">Brief</span></div>
+            <a href="#pricing" class="cta-button">Get Early Access</a>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+        <h1>Meeting Notes That <span class="highlight">Write Themselves</span></h1>
+        <p class="subtitle">Stop wasting time on meeting transcripts. Get automatically generated summaries, action items, and follow-ups in seconds.</p>
+
+        <div class="problems">
+            <div class="problem-card">
+                <div class="problem-icon">⏱️</div>
+                <h3>You Waste 5+ Hours/Week</h3>
+                <p>Manually organizing notes from meetings</p>
+            </div>
+            <div class="problem-card">
+                <div class="problem-icon">😤</div>
+                <h3>Action Items Get Lost</h3>
+                <p>Scattered across Slack, email, and notebooks</p>
+            </div>
+            <div class="problem-card">
+                <div class="problem-icon">❌</div>
+                <h3>No Accountability</h3>
+                <p>Nobody remembers who was responsible for what</p>
+            </div>
+        </div>
+
+        <div class="cta-section">
+            <button class="cta-button" onclick="document.getElementById('email-input').focus()">Start Free Trial</button>
+            <p style="margin-top: 1rem; color: var(--text-light); font-size: 0.95rem;">No credit card required • First 3 recordings free</p>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="features">
+        <h2 class="section-title">How It Works</h2>
+        <div class="features-grid">
+            <div class="feature">
+                <h3>🎙️ Upload or Record</h3>
+                <p>Upload an audio file or record directly from your browser. We support MP3, WAV, M4A, and more.</p>
+            </div>
+            <div class="feature">
+                <h3>⚡ AI Processing</h3>
+                <p>Our AI instantly transcribes your meeting and extracts key decisions, action items, and topics.</p>
+            </div>
+            <div class="feature">
+                <h3>📧 Get Your Summary</h3>
+                <p>Receive a clean, organized summary emailed to you with clear action items and owners.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="stats">
+        <div class="stats-content">
+            <div class="stat">
+                <div class="stat-number">60%</div>
+                <div class="stat-label">Time saved on note-taking</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Action items captured</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">2s</div>
+                <div class="stat-label">Average processing time</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing -->
+    <section class="pricing" id="pricing">
+        <h2 class="section-title">Simple, Transparent Pricing</h2>
+        <div class="pricing-grid">
+            <div class="pricing-card">
+                <h3>Free</h3>
+                <div class="price">$0</div>
+                <div class="price-period">Forever free</div>
+                <ul class="features-list">
+                    <li>3 recordings/month</li>
+                    <li>AI summaries</li>
+                    <li>Action item extraction</li>
+                    <li>Email delivery</li>
+                </ul>
+                <button class="email-button" onclick="document.getElementById('email-input').focus()">Get Started</button>
+            </div>
+
+            <div class="pricing-card popular">
+                <div class="popular-badge">Most Popular</div>
+                <h3>Pro</h3>
+                <div class="price">$15</div>
+                <div class="price-period">per month</div>
+                <ul class="features-list">
+                    <li>50 recordings/month</li>
+                    <li>Priority processing</li>
+                    <li>Slack integration</li>
+                    <li>Email summaries</li>
+                    <li>Team access</li>
+                </ul>
+                <button class="email-button" onclick="document.getElementById('email-input').focus()">Start Trial</button>
+            </div>
+
+            <div class="pricing-card">
+                <h3>Team</h3>
+                <div class="price">$49</div>
+                <div class="price-period">per month</div>
+                <ul class="features-list">
+                    <li>Unlimited recordings</li>
+                    <li>Team workspace</li>
+                    <li>Admin controls</li>
+                    <li>Priority support</li>
+                    <li>Custom exports</li>
+                </ul>
+                <button class="email-button" onclick="document.getElementById('email-input').focus()">Start Trial</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Email Capture -->
+    <section class="email-section">
+        <div class="email-content">
+            <h2>Get Early Access</h2>
+            <p>Be among the first to automate your meeting notes. Limited spots available.</p>
+            <form id="email-form" onsubmit="handleEmailSubmit(event)">
+                <div class="email-form">
+                    <input 
+                        type="email" 
+                        id="email-input"
+                        class="email-input" 
+                        placeholder="your@email.com" 
+                        required
+                    >
+                    <button type="submit" class="email-button">Join Waitlist</button>
+                </div>
+            </form>
+            <div id="email-message" class="email-message"></div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 MeetingBrief. Made by people who hate manual note-taking.</p>
+    </footer>
+
+    <script>
+        function handleEmailSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('email-input').value;
+            const messageEl = document.getElementById('email-message');
+            
+            // Send to your backend or email service
+            // For now, just show confirmation
+            messageEl.innerHTML = `✓ Thanks! Check your email for next steps. We'll contact you within 24 hours.`;
+            document.getElementById('email-form').style.display = 'none';
+            
+            // In production, send this to your backend:
+            // fetch('/api/waitlist', { method: 'POST', body: JSON.stringify({ email }) })
+        }
+    </script>
+</body>
+</html>
